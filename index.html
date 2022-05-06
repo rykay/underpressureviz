@@ -148,7 +148,7 @@
             .attr("dy", "0.71em")
             .attr("text-anchor", "end")
             .style('fill', 'white')
-            
+            .text("value");
 
         //draw rects
         svg.selectAll(".bar")
@@ -163,7 +163,7 @@
 
         svg.selectAll("rect")
             .transition()
-            .duration(800)
+            .duration(1600)
             .attr("y", function(d) { return yScale(d.percent_won); })
             .attr("height", function(d) { return height - yScale(d.percent_won); })
             .delay(function(d,i){console.log(i) ; return(i*100)})

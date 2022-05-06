@@ -39,6 +39,12 @@
         top: 100%;
         left: 0;
     }
+
+    .axisWhite {
+        stroke :white;
+    }
+
+
 </style>
 <html>
 <head>
@@ -110,6 +116,7 @@
 
         //create x axis and apply xScale
         svg.append("g")
+            .attr("class", "axisWhite")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(xScale))
             .append("text")
@@ -120,6 +127,7 @@
 
         //create y axis and apply yScale
         svg.append("g")
+            .attr("class", "axisWhite")
             .call(d3.axisLeft(yScale).tickFormat(function(d){
                 return d + "%";
             }).ticks(20))
@@ -127,6 +135,7 @@
             .attr("y", 6)
             .attr("dy", "0.71em")
             .attr("text-anchor", "end")
+            .style('fill', 'white')
             .text("value");
 
         //draw rects

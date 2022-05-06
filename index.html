@@ -1,0 +1,167 @@
+<!doctype HTML>
+<meta charset="utf-8">
+<style>
+
+    .bar:hover {
+        stroke: black;
+    }
+
+    .bar:hover {
+        fill: red ;
+    }
+
+
+    .d3-tip {
+        line-height: 1;
+        font-weight: bold;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        border-radius: 2px;
+    }
+
+    /* Creates a small triangle extender for the tooltip */
+    .d3-tip:after {
+        box-sizing: border-box;
+        display: inline;
+        font-size: 10px;
+        width: 100%;
+        line-height: 1;
+        color: rgba(0, 0, 0, 0.8);
+        content: "\25BC";
+        position: absolute;
+        text-align: center;
+    }
+
+    /* Style northward tooltips differently */
+    .d3-tip.n:after {
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
+    }
+</style>
+<html>
+<head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.0/d3-tip.min.js" integrity="sha512-X92oNmUSgp9U5a3x5uE7CBJZuOP1s7B4CGoV/FvDsQjgybX/Ycl58nrPxx0ktE0I3Csq4vXdLVV5iwOC2Bzgog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js" integrity="sha512-wNH6xsp2n8CfB91nrBtfc4sfLwYPBMjSWVUwQOp60AYYXH6i8yCwuKFZ4rgK2i6pQek/b+bSyR7b01/922IBzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<div id="under_pressure_viz"></div>
+<body>
+<script>
+
+    // set the dimensions and margins of the graph
+    var margin = {top: 80, right: 150, bottom: 50, left: 50},
+        width = 750 - margin.left - margin.right,
+        height = 700 - margin.top - margin.bottom;
+
+    // var tip = d3.tip()
+    //     .attr('class', 'd3-tip')
+    //     .offset([-10, 0])
+    //     .html(function(d) {
+    //         return "<strong>Percent:</strong> <span style='color:red'>" + d.percent_won + "</span>";
+    //     })
+
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#under_pressure_viz")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+    // svg.call(tip)
+
+
+
+
+    //Read the data
+    d3.csv("https://raw.githubusercontent.com/rykay/RafaFrenchOpen/main/PressureFinal.csv").then(data => {
+
+        // tournament list for domain of x axis
+         let tournaments = ["Monte Carlo", "Rome", "Barcelona", "Buenos Aires", "Roland Garros", "Sao Paulo", "Madrid"]
+
+        data.forEach(function(d) {
+            d.tourney_name = d.tourney_name;
+            d.percent_won = d.percent_won;
+        });
+
+
+        var xScale = d3.scaleBand()
+            .range([0, width]).padding(0.4);
+        var yScale = d3.scaleLinear()
+            .range([height, 0]);
+        xScale.domain(tournaments);
+        yScale.domain([0, 100]);
+
+        //gotten from color brewer
+        var colors = ["#fdd0a2",
+            "#fdae6b",
+            "#fd8d3c",
+            "#f16913",
+            "#d94801"];
+        var sequentialScale = d3.scaleQuantize()
+            .domain([0,100])
+            .range(colors);
+
+
+        //create x axis and apply xScale
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(xScale))
+            .append("text")
+            .attr("y", height-265)
+            .attr("x", width-200)
+            .attr("stroke", "black")
+            .text("Year");
+
+        //create y axis and apply yScale
+        svg.append("g")
+            .call(d3.axisLeft(yScale).tickFormat(function(d){
+                return d + "%";
+            }).ticks(20))
+            .append("text")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text("value");
+
+        //draw rects
+        svg.selectAll(".bar")
+            .data(data)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function(d) { return xScale(d.tourney_name); })
+            .attr("width", xScale.bandwidth())
+            .attr("fill", function(d) { return sequentialScale(d.percent_won);})
+            .attr("height", function(d) { return height - yScale(0); })
+            .attr("y", function(d) { return yScale(0); })
+
+        svg.selectAll("rect")
+            .transition()
+            .duration(800)
+            .attr("y", function(d) { return yScale(d.percent_won); })
+            .attr("height", function(d) { return height - yScale(d.percent_won); })
+            .delay(function(d,i){console.log(i) ; return(i*100)})
+
+
+
+        //create and apply legend
+        var legend = d3.legendColor()
+            .labelFormat(d3.format('.2f'))
+            .title('Percent Won')
+            .scale(sequentialScale)
+        svg.append("g")
+            .attr('class', 'legend')
+            .attr('transform', 'translate(' + (width - margin.right/4 + 62) + ',' + ((height - margin.bottom) / 45) + ')')
+            .call(legend)
+
+
+
+    })
+</script>
+</body>
+</html>

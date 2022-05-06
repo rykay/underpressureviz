@@ -54,7 +54,6 @@
 
     text{
         fill: white;
-        font-weight: lighter;
     }
 
 
@@ -135,7 +134,7 @@
             .append("text")
             .attr("y", height-265)
             .attr("x", width-200)
-            .attr("stroke", "black")
+            .attr("font-weight", "lighter")
             .text("Year");
 
         //create y axis and apply yScale
@@ -149,7 +148,7 @@
             .attr("dy", "0.71em")
             .attr("text-anchor", "end")
             .style('fill', 'white')
-            .text("value");
+            
 
         //draw rects
         svg.selectAll(".bar")

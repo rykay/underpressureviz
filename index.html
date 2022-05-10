@@ -11,36 +11,9 @@
     }
 
 
-    .d3-tip {
-        line-height: 1;
-        font-weight: bold;
-        padding: 12px;
-        background: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        border-radius: 2px;
+    .axisWhite {
+        stroke :white;
     }
-
-    /* Creates a small triangle extender for the tooltip */
-    .d3-tip:after {
-        box-sizing: border-box;
-        display: inline;
-        font-size: 10px;
-        width: 100%;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.8);
-        content: "\25BC";
-        position: absolute;
-        text-align: center;
-    }
-
-    /* Style northward tooltips differently */
-    .d3-tip.n:after {
-        margin: -1px 0 0 0;
-        top: 100%;
-        left: 0;
-    }
-
- 
 
     .axisWhite line{
         stroke: white;
@@ -51,7 +24,19 @@
     }
 
     text{
-        fill: white;
+        fill: black;
+    }
+
+    div.tooltip-bar {
+        position: absolute;
+        text-align: center;
+        padding: .5rem;
+        background: #FFFFFF;
+        color: #313639;
+        border: 1px solid #313639;
+        border-radius: 8px;
+        pointer-events: none;
+        font-size: 0.8rem;
     }
 
 
@@ -71,13 +56,6 @@
     var margin = {top: 80, right: 150, bottom: 50, left: 50},
         width = 750 - margin.left - margin.right,
         height = 700 - margin.top - margin.bottom;
-
-    // var tip = d3.tip()
-    //     .attr('class', 'd3-tip')
-    //     .offset([-10, 0])
-    //     .html(function(d) {
-    //         return "<strong>Percent:</strong> <span style='color:red'>" + d.percent_won + "</span>";
-    //     })
 
 
     // append the svg object to the body of the page
@@ -132,6 +110,7 @@
             .append("text")
             .attr("y", height-265)
             .attr("x", width-200)
+            .attr("font-weight", "lighter")
             .text("Year");
 
         //create y axis and apply yScale
@@ -143,8 +122,13 @@
             .append("text")
             .attr("y", 6)
             .attr("dy", "0.71em")
-            .attr("text-anchor", "end");
-            
+            .attr("text-anchor", "end")
+            .style('fill', 'white')
+            .text("value");
+
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip-bar")
+            .style("opacity", 0);
 
         //draw rects
         svg.selectAll(".bar")
@@ -157,12 +141,41 @@
             .attr("height", function(d) { return height - yScale(0); })
             .attr("y", function(d) { return yScale(0); })
 
+
         svg.selectAll("rect")
             .transition()
-            .duration(4000)
+            .duration(1600)
             .attr("y", function(d) { return yScale(d.percent_won); })
             .attr("height", function(d) { return height - yScale(d.percent_won); })
             .delay(function(d,i){console.log(i) ; return(i*100)})
+
+
+        svg.selectAll("rect")
+            .on('mouseover', function (d, i) {
+                d3.select(this).transition()
+                    .duration('50')
+                    .attr('opacity', '.85');
+                //Makes the new div appear on hover:
+                div.transition()
+                    .duration(50)
+                    .style("opacity", 1);
+                let insert = d3.select(this).attr("height")
+                console.log(insert)
+                console.log(d.tourney_name)
+                div.html(Math.round((insert/height) * 100) + "%")
+                    .style("left", d3.select(this).attr("x") + 50 + "px")
+                    .style("top", d3.select(this).attr("y") + "px" );
+
+            })
+            .on('mouseout', function (d, i) {
+                d3.select(this).transition()
+                    .duration('50')
+                    .attr('opacity', '1');
+                //Makes the new div disappear:
+                div.transition()
+                    .duration('50')
+                    .style("opacity", 0);
+            });
 
 
 

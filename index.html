@@ -67,11 +67,6 @@
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
 
-    // svg.call(tip)
-
-
-
-
     //Read the data
     d3.csv("https://raw.githubusercontent.com/rykay/RafaFrenchOpen/main/PressureFinal.csv").then(data => {
 
@@ -160,9 +155,9 @@
                     .style("opacity", 1);
                 let insert = d3.select(this).attr("height")
                 console.log(insert)
-                console.log(d.tourney_name)
-                div.html(Math.round((insert/height) * 100) + "%")
-                    .style("left", d3.select(this).attr("x") + 50 + "px")
+                console.log(d3.pointer(d,i))
+                div.html("Percent won: " + Math.round((insert/height) * 100))
+                    .style("left", d3.select(this).attr("x") + "px")
                     .style("top", d3.select(this).attr("y") + "px" );
 
             })
